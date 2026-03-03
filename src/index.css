@@ -1,0 +1,200 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 
+ * PERIOD TRACKER APP - DESIGN SYSTEM
+ * ===================================
+ * This file defines all colors, gradients, fonts, and base styles.
+ * Colors are in HSL format for easy theming.
+ * 
+ * Color Palette:
+ * - Primary: Soft rose/coral for main actions
+ * - Secondary: Warm cream for backgrounds
+ * - Accent: Soft lavender for ovulation/fertility
+ * - Muted: Warm grays for text and borders
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    /* Main background - warm off-white */
+    --background: 30 50% 98%;
+    --foreground: 350 20% 20%;
+
+    /* Cards - slightly warmer white */
+    --card: 30 40% 99%;
+    --card-foreground: 350 20% 20%;
+
+    /* Popover */
+    --popover: 30 40% 99%;
+    --popover-foreground: 350 20% 20%;
+
+    /* Primary - Soft rose/coral */
+    --primary: 350 65% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary - Warm cream */
+    --secondary: 35 60% 95%;
+    --secondary-foreground: 350 20% 25%;
+
+    /* Muted - Warm gray */
+    --muted: 30 20% 94%;
+    --muted-foreground: 350 10% 45%;
+
+    /* Accent - Soft lavender (for ovulation/fertility) */
+    --accent: 280 40% 85%;
+    --accent-foreground: 280 40% 25%;
+
+    /* Destructive */
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Borders and inputs */
+    --border: 30 30% 88%;
+    --input: 30 30% 88%;
+    --ring: 350 65% 60%;
+
+    --radius: 1rem;
+
+    /* Custom colors for cycle phases */
+    --period: 350 70% 55%;
+    --period-light: 350 70% 92%;
+    --ovulation: 280 50% 65%;
+    --ovulation-light: 280 50% 92%;
+    --fertile: 160 50% 50%;
+    --fertile-light: 160 50% 90%;
+    --pms: 35 80% 60%;
+    --pms-light: 35 80% 92%;
+    
+    /* Mood colors */
+    --mood-happy: 45 90% 55%;
+    --mood-sad: 220 60% 60%;
+    --mood-anxious: 280 50% 60%;
+    --mood-calm: 160 50% 55%;
+    --mood-irritable: 15 80% 55%;
+    --mood-energetic: 35 90% 55%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(350 65% 60%), hsl(350 70% 70%));
+    --gradient-secondary: linear-gradient(135deg, hsl(35 60% 95%), hsl(30 50% 98%));
+    --gradient-cycle: linear-gradient(135deg, hsl(350 70% 55%), hsl(280 50% 65%));
+    --gradient-card: linear-gradient(180deg, hsl(30 40% 99%), hsl(30 30% 97%));
+
+    /* Shadows */
+    --shadow-soft: 0 4px 20px -4px hsl(350 30% 50% / 0.15);
+    --shadow-medium: 0 8px 30px -8px hsl(350 30% 50% / 0.2);
+    --shadow-glow: 0 0 40px -10px hsl(350 65% 60% / 0.3);
+
+    /* Sidebar (keeping for compatibility) */
+    --sidebar-background: 30 50% 98%;
+    --sidebar-foreground: 350 20% 30%;
+    --sidebar-primary: 350 65% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 35 60% 95%;
+    --sidebar-accent-foreground: 350 20% 25%;
+    --sidebar-border: 30 30% 88%;
+    --sidebar-ring: 350 65% 60%;
+  }
+
+  .dark {
+    --background: 350 20% 8%;
+    --foreground: 30 50% 95%;
+
+    --card: 350 20% 12%;
+    --card-foreground: 30 50% 95%;
+
+    --popover: 350 20% 12%;
+    --popover-foreground: 30 50% 95%;
+
+    --primary: 350 65% 65%;
+    --primary-foreground: 350 20% 10%;
+
+    --secondary: 350 20% 18%;
+    --secondary-foreground: 30 50% 95%;
+
+    --muted: 350 20% 18%;
+    --muted-foreground: 30 20% 65%;
+
+    --accent: 280 40% 35%;
+    --accent-foreground: 280 40% 90%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 350 20% 20%;
+    --input: 350 20% 20%;
+    --ring: 350 65% 65%;
+
+    --sidebar-background: 350 20% 10%;
+    --sidebar-foreground: 30 50% 95%;
+    --sidebar-primary: 350 65% 65%;
+    --sidebar-primary-foreground: 350 20% 10%;
+    --sidebar-accent: 350 20% 18%;
+    --sidebar-accent-foreground: 30 50% 95%;
+    --sidebar-border: 350 20% 20%;
+    --sidebar-ring: 350 65% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Nunito', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Quicksand', sans-serif;
+    @apply font-semibold;
+  }
+}
+
+@layer components {
+  /* Cycle phase badges */
+  .phase-period {
+    @apply bg-period-light text-period;
+  }
+  
+  .phase-ovulation {
+    @apply bg-ovulation-light text-ovulation;
+  }
+  
+  .phase-fertile {
+    @apply bg-fertile-light text-fertile;
+  }
+  
+  .phase-pms {
+    @apply bg-pms-light text-pms;
+  }
+
+  /* Glass effect for cards */
+  .glass-card {
+    @apply bg-card/80 backdrop-blur-lg border border-white/20;
+  }
+}
+
+@layer utilities {
+  /* Custom animation utilities */
+  .animate-pulse-soft {
+    animation: pulse-soft 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse-soft {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.02); }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+}
