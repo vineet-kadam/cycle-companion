@@ -7,20 +7,38 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const fetchProfile = async (userId) => {
+    const { data } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('user_id', userId)
+      .maybeSingle();
+    setProfile(data);
+    return data;
+  };
+
   useEffect(() => {
-    // Set up auth state listener BEFORE checking session
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      async (_event, session) => {
         setUser(session?.user ?? null);
+        if (session?.user) {
+          // Defer profile fetch to avoid Supabase deadlock
+          setTimeout(() => fetchProfile(session.user.id), 0);
+        } else {
+          setProfile(null);
+        }
         setLoading(false);
       }
     );
 
-    // Check current session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchProfile(session.user.id);
+      }
       setLoading(false);
     });
 
@@ -29,10 +47,11 @@ export const AuthProvider = ({ children }) => {
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    setProfile(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signOut }}>
+    <AuthContext.Provider value={{ user, profile, loading, signOut, fetchProfile }}>
       {children}
     </AuthContext.Provider>
   );

@@ -19,6 +19,7 @@ export type Database = {
           created_at: string | null
           cycle_length: number | null
           date_of_birth: string | null
+          email: string | null
           first_name: string | null
           id: string
           last_name: string | null
@@ -35,6 +36,7 @@ export type Database = {
           created_at?: string | null
           cycle_length?: number | null
           date_of_birth?: string | null
+          email?: string | null
           first_name?: string | null
           id?: string
           last_name?: string | null
@@ -51,6 +53,7 @@ export type Database = {
           created_at?: string | null
           cycle_length?: number | null
           date_of_birth?: string | null
+          email?: string | null
           first_name?: string | null
           id?: string
           last_name?: string | null
