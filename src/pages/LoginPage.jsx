@@ -9,9 +9,32 @@ import { toast } from 'sonner';
 
 const LoginPage = () => {
   const [isSignUp, setIsSignUp] = useState(false);
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState(''); // email or username
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const isEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+
+  const resolveEmail = async (usernameOrEmail) => {
+    if (isEmail(usernameOrEmail)) return usernameOrEmail;
+
+    // Look up email by username
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('user_id')
+      .eq('username', usernameOrEmail.trim().toLowerCase())
+      .maybeSingle();
+
+    if (error || !data) {
+      throw new Error('Username not found');
+    }
+
+    // Get the user's email from the profile - we need an edge function or 
+    // store email in profiles. For now, let's query auth admin.
+    // Since we can't query auth.users from client, we'll store email approach.
+    // Actually, let's use a simpler approach: store email in profiles via trigger.
+    throw new Error('Username login requires email stored in profile. Please use your email for now.');
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,8 +42,13 @@ const LoginPage = () => {
 
     try {
       if (isSignUp) {
+        if (!isEmail(identifier)) {
+          toast.error('Please use a valid email address to sign up');
+          setLoading(false);
+          return;
+        }
         const { error } = await supabase.auth.signUp({
-          email,
+          email: identifier,
           password,
           options: { emailRedirectTo: window.location.origin },
         });
@@ -29,6 +57,24 @@ const LoginPage = () => {
           description: 'Check your email for a confirmation link.',
         });
       } else {
+        let email = identifier;
+
+        // If not an email, try to resolve username
+        if (!isEmail(identifier)) {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('email')
+            .eq('username', identifier.trim().toLowerCase())
+            .maybeSingle();
+
+          if (error || !data || !data.email) {
+            toast.error('Username not found. Try using your email instead.');
+            setLoading(false);
+            return;
+          }
+          email = data.email;
+        }
+
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -51,7 +97,6 @@ const LoginPage = () => {
         transition={{ duration: 0.4 }}
         className="w-full max-w-md"
       >
-        {/* Logo / Brand */}
         <div className="text-center mb-8">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -74,19 +119,21 @@ const LoginPage = () => {
             <CardDescription>
               {isSignUp
                 ? 'Sign up to start tracking your cycle'
-                : 'Log in to view your cycle dashboard'}
+                : 'Log in with your email or username'}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="identifier">
+                  {isSignUp ? 'Email' : 'Email or Username'}
+                </Label>
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  id="identifier"
+                  type={isSignUp ? 'email' : 'text'}
+                  placeholder={isSignUp ? 'you@example.com' : 'Email or username'}
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
                   required
                 />
               </div>
