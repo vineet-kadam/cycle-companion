@@ -14,7 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          created_at: string | null
+          cycle_length: number | null
+          date_of_birth: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          last_period_date: string | null
+          onboarding_completed: boolean | null
+          period_end_date: string | null
+          period_length: number | null
+          period_start_date: string | null
+          updated_at: string | null
+          user_id: string
+          username: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          cycle_length?: number | null
+          date_of_birth?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          last_period_date?: string | null
+          onboarding_completed?: boolean | null
+          period_end_date?: string | null
+          period_length?: number | null
+          period_start_date?: string | null
+          updated_at?: string | null
+          user_id: string
+          username?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          cycle_length?: number | null
+          date_of_birth?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          last_period_date?: string | null
+          onboarding_completed?: boolean | null
+          period_end_date?: string | null
+          period_length?: number | null
+          period_start_date?: string | null
+          updated_at?: string | null
+          user_id?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
