@@ -11,6 +11,7 @@ import HistoryPage from "./pages/HistoryPage";
 import EducationPage from "./pages/EducationPage";
 import PregnancyPage from "./pages/PregnancyPage";
 import LoginPage from "./pages/LoginPage";
+import OnboardingPage from "./pages/OnboardingPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -23,9 +24,8 @@ const queryClient = new QueryClient({
   },
 });
 
-// Protected route wrapper - redirects to /login if not authenticated
 const ProtectedRoute = ({ children }) => {
-  const { user, loading } = useAuth();
+  const { user, profile, loading } = useAuth();
 
   if (loading) {
     return (
@@ -38,11 +38,17 @@ const ProtectedRoute = ({ children }) => {
   }
 
   if (!user) return <Navigate to="/login" replace />;
+
+  // Redirect to onboarding if profile not completed
+  if (profile && !profile.onboarding_completed) {
+    return <Navigate to="/onboarding" replace />;
+  }
+
   return children;
 };
 
 const AppRoutes = () => {
-  const { user, loading } = useAuth();
+  const { user, profile, loading } = useAuth();
 
   if (loading) {
     return (
@@ -57,6 +63,14 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
+      <Route
+        path="/onboarding"
+        element={
+          !user ? <Navigate to="/login" replace /> :
+          profile?.onboarding_completed ? <Navigate to="/" replace /> :
+          <OnboardingPage />
+        }
+      />
       <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
       <Route path="/calendar" element={<ProtectedRoute><CalendarPage /></ProtectedRoute>} />
       <Route path="/history" element={<ProtectedRoute><HistoryPage /></ProtectedRoute>} />
