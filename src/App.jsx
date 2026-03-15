@@ -1,81 +1,84 @@
-/**
- * APP ROUTER CONFIGURATION
- * ========================
- * Main application component with routing setup.
- * All routes are defined here for easy backend integration reference.
- * 
- * Available Routes:
- * - / (Home): Dashboard with cycle tracker
- * - /calendar: Full calendar view
- * - /history: Cycle history and statistics
- * - /education: Educational articles and tips
- * - /pregnancy: Pregnancy tracking (optional feature)
- * 
- * Backend developers:
- * - Each route corresponds to a page component in src/pages/
- * - API endpoints are documented in each page component
- */
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 
-// Page imports
 import Index from "./pages/Index";
 import CalendarPage from "./pages/CalendarPage";
 import HistoryPage from "./pages/HistoryPage";
 import EducationPage from "./pages/EducationPage";
 import PregnancyPage from "./pages/PregnancyPage";
+import LoginPage from "./pages/LoginPage";
 import NotFound from "./pages/NotFound";
 
-// React Query client for data fetching
-// Backend: Use this for API calls with caching
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // Refetch on window focus for fresh data
       refetchOnWindowFocus: false,
-      // Retry failed requests
       retry: 1,
-      // Stale time before refetching
-      staleTime: 5 * 60 * 1000 // 5 minutes
-    }
-  }
+      staleTime: 5 * 60 * 1000,
+    },
+  },
 });
 
-const App = () =>
-<QueryClientProvider client={queryClient}>
+// Protected route wrapper - redirects to /login if not authenticated
+const ProtectedRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-12 h-12 rounded-full bg-primary/20 animate-pulse flex items-center justify-center">
+          <span className="text-primary font-bold">F</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) return <Navigate to="/login" replace />;
+  return children;
+};
+
+const AppRoutes = () => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-12 h-12 rounded-full bg-primary/20 animate-pulse flex items-center justify-center">
+          <span className="text-primary font-bold">F</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <Routes>
+      <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
+      <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+      <Route path="/calendar" element={<ProtectedRoute><CalendarPage /></ProtectedRoute>} />
+      <Route path="/history" element={<ProtectedRoute><HistoryPage /></ProtectedRoute>} />
+      <Route path="/education" element={<ProtectedRoute><EducationPage /></ProtectedRoute>} />
+      <Route path="/pregnancy" element={<ProtectedRoute><PregnancyPage /></ProtectedRoute>} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      {/* Toast notifications */}
       <Toaster />
       <Sonner position="top-center" />
-      
-      {/* Router configuration */}
       <BrowserRouter>
-        <Routes>
-          {/* Main dashboard - cycle tracker */}
-          <Route path="/" element={<Index />} />
-          
-          {/* Full calendar view */}
-          <Route path="/calendar" element={<CalendarPage />} />
-          
-          {/* Cycle history and statistics */}
-          <Route path="/history" element={<HistoryPage />} />
-          
-          {/* Educational content */}
-          <Route path="/education" element={<EducationPage />} />
-          
-          {/* Pregnancy tracking (optional) */}
-          <Route path="/pregnancy" element={<PregnancyPage />} />
-          
-          {/* 404 fallback - keep this last */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
-  </QueryClientProvider>;
-
+  </QueryClientProvider>
+);
 
 export default App;
